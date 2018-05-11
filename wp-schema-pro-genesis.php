@@ -1,49 +1,50 @@
 <?php
 
 /**
- * Plugin Name:     Schema Pro - Genesis Compatibility
- * Plugin URI:      https://github.com/bizbudding/schema-pro-genesis
- * Description:     Automatically disable Genesis schema when Schema Pro is outputting JSON-LD data.
+ * Plugin Name:     Schema Pro - Genesis
+ * Plugin URI:      https://github.com/bizbudding/wp-schema-pro-genesis
+ * Description:     Automatically disables specific Genesis schema when Schema Pro is outputting JSON-LD data.
  * Version:         0.1.0
  *
  * Author:          Mike Hemberger
  * Author URI:      https://bizbudding.com
- * Text Domain:     'schema-pro-genesis'
+ * Text Domain:     'wp-schema-pro-genesis'
  */
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * Main Schema_Pro_Genesis_Compatibility Class.
+ * Main Schema_Pro_Genesis_Setup Class.
  *
- * @since 0.1.0
+ * @access  private
+ * @since   0.1.0
  */
-final class Schema_Pro_Genesis_Compatibility {
+final class Schema_Pro_Genesis_Setup {
 
 	/**
-	 * @var Schema_Pro_Genesis_Compatibility The one true Schema_Pro_Genesis_Compatibility
+	 * @var Schema_Pro_Genesis_Setup The one true Schema_Pro_Genesis_Setup
 	 * @since 0.1.0
 	 */
 	private static $instance;
 
 	/**
-	 * Main Schema_Pro_Genesis_Compatibility Instance.
+	 * Main Schema_Pro_Genesis_Setup Instance.
 	 *
-	 * Insures that only one instance of Schema_Pro_Genesis_Compatibility exists in memory at any one
+	 * Insures that only one instance of Schema_Pro_Genesis_Setup exists in memory at any one
 	 * time. Also prevents needing to define globals all over the place.
 	 *
 	 * @since   0.1.0
 	 * @static  var array $instance
-	 * @return  object | Schema_Pro_Genesis_Compatibility The one true Schema_Pro_Genesis_Compatibility
+	 * @return  object | Schema_Pro_Genesis_Setup The one true Schema_Pro_Genesis_Setup
 	 */
 	public static function instance() {
 		if ( ! isset( self::$instance ) ) {
 			// Setup the setup
-			self::$instance = new Schema_Pro_Genesis_Compatibility;
+			self::$instance = new Schema_Pro_Genesis_Setup;
 			// Methods
 			self::$instance->setup_constants();
-			self::$instance->includes();
+			// self::$instance->includes();
 			self::$instance->init();
 		}
 		return self::$instance;
@@ -61,7 +62,7 @@ final class Schema_Pro_Genesis_Compatibility {
 	 */
 	public function __clone() {
 		// Cloning instances of the class is forbidden.
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'schema-pro-genesis' ), '1.0' );
+		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'wp-schema-pro-genesis' ), '1.0' );
 	}
 
 	/**
@@ -73,7 +74,7 @@ final class Schema_Pro_Genesis_Compatibility {
 	 */
 	public function __wakeup() {
 		// Unserializing instances of the class is forbidden.
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'schema-pro-genesis' ), '1.0' );
+		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'wp-schema-pro-genesis' ), '1.0' );
 	}
 
 	/**
@@ -114,7 +115,6 @@ final class Schema_Pro_Genesis_Compatibility {
 		if ( ! defined( 'SCHEMA_PRO_GENESIS_BASENAME' ) ) {
 			define( 'SCHEMA_PRO_GENESIS_BASENAME', dirname( plugin_basename( __FILE__ ) ) );
 		}
-
 	}
 
 	/**
@@ -149,11 +149,13 @@ final class Schema_Pro_Genesis_Compatibility {
 		if ( ! class_exists( 'Puc_v4_Factory' ) ) {
 			require_once SCHEMA_PRO_GENESIS_INCLUDES_DIR . 'vendor/plugin-update-checker/plugin-update-checker.php'; // 4.4
 		}
-		$updater = Puc_v4_Factory::buildUpdateChecker( 'https://github.com/bizbudding/schema-pro-genesis', __FILE__, 'schema-pro-genesis' );
+		$updater = Puc_v4_Factory::buildUpdateChecker( 'https://github.com/bizbudding/wp-schema-pro-genesis', __FILE__, 'wp-schema-pro-genesis' );
 	}
 
 	/**
 	 * Remove Genesis schema if WP Schema Pro is outputting schema on the current page.
+	 * A lot of the conditional code was taken directly from:
+	 * /plugins/wp-schema-pro/classes/class-bsf-aiosrs-pro-markup.php
 	 *
 	 * @uses    Genesis.
 	 * @uses    Schema Pro.
@@ -167,6 +169,7 @@ final class Schema_Pro_Genesis_Compatibility {
 			return;
 		}
 
+		// Get schema settings.
 		$general_settings = BSF_AIOSRS_Pro_Admin::get_options( 'wp-schema-pro-general-settings' );
 		$global_settings  = BSF_AIOSRS_Pro_Admin::get_options( 'wp-schema-pro-global-schemas' );
 		$posts            = BSF_AIOSRS_Pro_Markup::get_schema_posts();
@@ -181,15 +184,15 @@ final class Schema_Pro_Genesis_Compatibility {
 			add_filter( 'genesis_attr_breadcrumb', array( $this, 'remove_attributes' ), 20 );
 		}
 
-		// Bail if not a single page/post/cpt.
-		if ( ! is_singular() ) {
-			return;
-		}
-
-		// Posts.
+		// Content.
 		if ( is_array( $posts ) && ! empty( $posts ) ) {
 			add_filter( 'genesis_attr_content', array( $this, 'remove_attributes' ), 20 );
 			add_filter( 'genesis_attr_entry',   array( $this, 'remove_attributes' ), 20 );
+		}
+
+		// Bail if not a single page/post/cpt.
+		if ( ! is_singular() ) {
+			return;
 		}
 
 		// Set variables.
@@ -220,9 +223,9 @@ final class Schema_Pro_Genesis_Compatibility {
 }
 
 /**
- * The main function for that returns Schema_Pro_Genesis_Compatibility
+ * The main function for that returns Schema_Pro_Genesis_Setup
  *
- * The main function responsible for returning the one true Schema_Pro_Genesis_Compatibility
+ * The main function responsible for returning the one true Schema_Pro_Genesis_Setup
  * Instance to functions everywhere.
  *
  * Use this function like you would a global variable, except without needing
@@ -232,10 +235,10 @@ final class Schema_Pro_Genesis_Compatibility {
  *
  * @since 0.1.0
  *
- * @return object|Schema_Pro_Genesis_Compatibility The one true Schema_Pro_Genesis_Compatibility Instance.
+ * @return object|Schema_Pro_Genesis_Setup The one true Schema_Pro_Genesis_Setup Instance.
  */
 function Schema_Pro_Genesis() {
-	return Schema_Pro_Genesis_Compatibility::instance();
+	return Schema_Pro_Genesis_Setup::instance();
 }
 
 // Get Schema_Pro_Genesis Running.

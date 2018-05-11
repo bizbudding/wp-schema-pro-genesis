@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Plugin Name:     Schema Pro - Genesis Compatibility
+ * Plugin Name:     Schema Pro - Genesis
  * Plugin URI:      https://github.com/bizbudding/wp-schema-pro-genesis
- * Description:     Automatically disable Genesis schema when Schema Pro is outputting JSON-LD data.
+ * Description:     Automatically disables specific Genesis schema when Schema Pro is outputting JSON-LD data.
  * Version:         0.1.0
  *
  * Author:          Mike Hemberger
@@ -15,32 +15,33 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * Main Schema_Pro_Genesis_Compatibility Class.
+ * Main Schema_Pro_Genesis_Setup Class.
  *
- * @since 0.1.0
+ * @access  private
+ * @since   0.1.0
  */
-final class Schema_Pro_Genesis_Compatibility {
+final class Schema_Pro_Genesis_Setup {
 
 	/**
-	 * @var Schema_Pro_Genesis_Compatibility The one true Schema_Pro_Genesis_Compatibility
+	 * @var Schema_Pro_Genesis_Setup The one true Schema_Pro_Genesis_Setup
 	 * @since 0.1.0
 	 */
 	private static $instance;
 
 	/**
-	 * Main Schema_Pro_Genesis_Compatibility Instance.
+	 * Main Schema_Pro_Genesis_Setup Instance.
 	 *
-	 * Insures that only one instance of Schema_Pro_Genesis_Compatibility exists in memory at any one
+	 * Insures that only one instance of Schema_Pro_Genesis_Setup exists in memory at any one
 	 * time. Also prevents needing to define globals all over the place.
 	 *
 	 * @since   0.1.0
 	 * @static  var array $instance
-	 * @return  object | Schema_Pro_Genesis_Compatibility The one true Schema_Pro_Genesis_Compatibility
+	 * @return  object | Schema_Pro_Genesis_Setup The one true Schema_Pro_Genesis_Setup
 	 */
 	public static function instance() {
 		if ( ! isset( self::$instance ) ) {
 			// Setup the setup
-			self::$instance = new Schema_Pro_Genesis_Compatibility;
+			self::$instance = new Schema_Pro_Genesis_Setup;
 			// Methods
 			self::$instance->setup_constants();
 			// self::$instance->includes();
@@ -222,9 +223,9 @@ final class Schema_Pro_Genesis_Compatibility {
 }
 
 /**
- * The main function for that returns Schema_Pro_Genesis_Compatibility
+ * The main function for that returns Schema_Pro_Genesis_Setup
  *
- * The main function responsible for returning the one true Schema_Pro_Genesis_Compatibility
+ * The main function responsible for returning the one true Schema_Pro_Genesis_Setup
  * Instance to functions everywhere.
  *
  * Use this function like you would a global variable, except without needing
@@ -234,10 +235,10 @@ final class Schema_Pro_Genesis_Compatibility {
  *
  * @since 0.1.0
  *
- * @return object|Schema_Pro_Genesis_Compatibility The one true Schema_Pro_Genesis_Compatibility Instance.
+ * @return object|Schema_Pro_Genesis_Setup The one true Schema_Pro_Genesis_Setup Instance.
  */
 function Schema_Pro_Genesis() {
-	return Schema_Pro_Genesis_Compatibility::instance();
+	return Schema_Pro_Genesis_Setup::instance();
 }
 
 // Get Schema_Pro_Genesis Running.

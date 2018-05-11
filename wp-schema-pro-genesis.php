@@ -184,15 +184,15 @@ final class Schema_Pro_Genesis_Setup {
 			add_filter( 'genesis_attr_breadcrumb', array( $this, 'remove_attributes' ), 20 );
 		}
 
-		// Bail if not a single page/post/cpt.
-		if ( ! is_singular() ) {
-			return;
-		}
-
-		// Posts.
+		// Content.
 		if ( is_array( $posts ) && ! empty( $posts ) ) {
 			add_filter( 'genesis_attr_content', array( $this, 'remove_attributes' ), 20 );
 			add_filter( 'genesis_attr_entry',   array( $this, 'remove_attributes' ), 20 );
+		}
+
+		// Bail if not a single page/post/cpt.
+		if ( ! is_singular() ) {
+			return;
 		}
 
 		// Set variables.

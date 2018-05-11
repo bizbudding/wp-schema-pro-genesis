@@ -2,13 +2,13 @@
 
 /**
  * Plugin Name:     Schema Pro - Genesis Compatibility
- * Plugin URI:      https://github.com/bizbudding/schema-pro-genesis
+ * Plugin URI:      https://github.com/bizbudding/wp-schema-pro-genesis
  * Description:     Automatically disable Genesis schema when Schema Pro is outputting JSON-LD data.
  * Version:         0.1.0
  *
  * Author:          Mike Hemberger
  * Author URI:      https://bizbudding.com
- * Text Domain:     'schema-pro-genesis'
+ * Text Domain:     'wp-schema-pro-genesis'
  */
 
 // Exit if accessed directly.
@@ -43,7 +43,7 @@ final class Schema_Pro_Genesis_Compatibility {
 			self::$instance = new Schema_Pro_Genesis_Compatibility;
 			// Methods
 			self::$instance->setup_constants();
-			self::$instance->includes();
+			// self::$instance->includes();
 			self::$instance->init();
 		}
 		return self::$instance;
@@ -61,7 +61,7 @@ final class Schema_Pro_Genesis_Compatibility {
 	 */
 	public function __clone() {
 		// Cloning instances of the class is forbidden.
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'schema-pro-genesis' ), '1.0' );
+		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'wp-schema-pro-genesis' ), '1.0' );
 	}
 
 	/**
@@ -73,7 +73,7 @@ final class Schema_Pro_Genesis_Compatibility {
 	 */
 	public function __wakeup() {
 		// Unserializing instances of the class is forbidden.
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'schema-pro-genesis' ), '1.0' );
+		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'wp-schema-pro-genesis' ), '1.0' );
 	}
 
 	/**
@@ -114,7 +114,6 @@ final class Schema_Pro_Genesis_Compatibility {
 		if ( ! defined( 'SCHEMA_PRO_GENESIS_BASENAME' ) ) {
 			define( 'SCHEMA_PRO_GENESIS_BASENAME', dirname( plugin_basename( __FILE__ ) ) );
 		}
-
 	}
 
 	/**
@@ -149,11 +148,13 @@ final class Schema_Pro_Genesis_Compatibility {
 		if ( ! class_exists( 'Puc_v4_Factory' ) ) {
 			require_once SCHEMA_PRO_GENESIS_INCLUDES_DIR . 'vendor/plugin-update-checker/plugin-update-checker.php'; // 4.4
 		}
-		$updater = Puc_v4_Factory::buildUpdateChecker( 'https://github.com/bizbudding/schema-pro-genesis', __FILE__, 'schema-pro-genesis' );
+		$updater = Puc_v4_Factory::buildUpdateChecker( 'https://github.com/bizbudding/wp-schema-pro-genesis', __FILE__, 'wp-schema-pro-genesis' );
 	}
 
 	/**
 	 * Remove Genesis schema if WP Schema Pro is outputting schema on the current page.
+	 * A lot of the conditional code was taken directly from:
+	 * /plugins/wp-schema-pro/classes/class-bsf-aiosrs-pro-markup.php
 	 *
 	 * @uses    Genesis.
 	 * @uses    Schema Pro.
@@ -167,6 +168,7 @@ final class Schema_Pro_Genesis_Compatibility {
 			return;
 		}
 
+		// Get schema settings.
 		$general_settings = BSF_AIOSRS_Pro_Admin::get_options( 'wp-schema-pro-general-settings' );
 		$global_settings  = BSF_AIOSRS_Pro_Admin::get_options( 'wp-schema-pro-global-schemas' );
 		$posts            = BSF_AIOSRS_Pro_Markup::get_schema_posts();

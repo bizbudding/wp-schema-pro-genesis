@@ -129,7 +129,7 @@ final class Schema_Pro_Genesis_Setup {
 	}
 
 	/**
-	 * Initalize
+	 * Initialize.
 	 *
 	 * @return void
 	 */
@@ -162,7 +162,12 @@ final class Schema_Pro_Genesis_Setup {
 	 *
 	 * @return  void
 	 */
-	function run() {
+	public function run() {
+
+		// Bail if Genesis is not the parent theme.
+		if ( 'genesis'!== get_template() ) {
+			return;
+		}
 
 		// Bail if Schema Pro is not active.
 		if ( ! class_exists( 'BSF_AIOSRS_Pro' ) ) {
@@ -214,12 +219,13 @@ final class Schema_Pro_Genesis_Setup {
 	 *
 	 * @return  array  The modified attirbutes.
 	 */
-	function remove_attributes( $attributes ) {
+	public function remove_attributes( $attributes ) {
 		$attributes['itemprop']  = '';
 		$attributes['itemscope'] = '';
 		$attributes['itemtype']  = '';
 		return $attributes;
 	}
+
 }
 
 /**

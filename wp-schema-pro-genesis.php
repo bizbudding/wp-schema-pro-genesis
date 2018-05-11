@@ -4,7 +4,7 @@
  * Plugin Name:     Schema Pro - Genesis
  * Plugin URI:      https://github.com/bizbudding/wp-schema-pro-genesis
  * Description:     Automatically disables specific Genesis schema when Schema Pro is outputting JSON-LD data.
- * Version:         0.1.0
+ * Version:         0.1.1
  *
  * Author:          Mike Hemberger
  * Author URI:      https://bizbudding.com
@@ -88,7 +88,7 @@ final class Schema_Pro_Genesis_Setup {
 
 		// Plugin version.
 		if ( ! defined( 'SCHEMA_PRO_GENESIS_VERSION' ) ) {
-			define( 'SCHEMA_PRO_GENESIS_VERSION', '0.1.0' );
+			define( 'SCHEMA_PRO_GENESIS_VERSION', '0.1.1' );
 		}
 
 		// Plugin Folder Path.
@@ -186,7 +186,8 @@ final class Schema_Pro_Genesis_Setup {
 
 		// Breadcrumbs.
 		if ( '1' === $global_settings['breadcrumb'] ) {
-			add_filter( 'genesis_attr_breadcrumb', array( $this, 'remove_attributes' ), 20 );
+			add_filter( 'genesis_attr_breadcrumb',           array( $this, 'remove_attributes' ), 20 );
+			add_filter( 'genesis_attr_breadcrumb-link-wrap', array( $this, 'remove_attributes' ), 20 );
 		}
 
 		// Content.

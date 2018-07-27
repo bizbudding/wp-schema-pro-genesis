@@ -164,6 +164,11 @@ final class Schema_Pro_Genesis_Setup {
 	 */
 	public function run() {
 
+		// Bail if not on the front end.
+		if ( is_admin() ) {
+			return;
+		}
+
 		// Bail if Genesis is not the parent theme.
 		if ( 'genesis'!== get_template() ) {
 			return;

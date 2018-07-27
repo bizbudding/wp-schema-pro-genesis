@@ -4,7 +4,7 @@
  * Plugin Name:     Schema Pro - Genesis
  * Plugin URI:      https://github.com/bizbudding/wp-schema-pro-genesis
  * Description:     Automatically disables specific Genesis schema when Schema Pro is outputting JSON-LD data.
- * Version:         0.1.1
+ * Version:         0.2.0
  *
  * Author:          Mike Hemberger
  * Author URI:      https://bizbudding.com
@@ -88,7 +88,7 @@ final class Schema_Pro_Genesis_Setup {
 
 		// Plugin version.
 		if ( ! defined( 'SCHEMA_PRO_GENESIS_VERSION' ) ) {
-			define( 'SCHEMA_PRO_GENESIS_VERSION', '0.1.1' );
+			define( 'SCHEMA_PRO_GENESIS_VERSION', '0.2.0' );
 		}
 
 		// Plugin Folder Path.

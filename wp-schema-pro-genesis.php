@@ -44,7 +44,7 @@ final class Schema_Pro_Genesis_Setup {
 			self::$instance = new Schema_Pro_Genesis_Setup;
 			// Methods
 			self::$instance->setup_constants();
-			// self::$instance->includes();
+			self::$instance->includes();
 			self::$instance->init();
 		}
 		return self::$instance;
@@ -125,7 +125,9 @@ final class Schema_Pro_Genesis_Setup {
 	 * @return  void
 	 */
 	private function includes() {
-		foreach ( glob( SCHEMA_PRO_GENESIS_INCLUDES_DIR . '*.php' ) as $file ) { include $file; }
+		// Include vendor libraries.
+		require_once __DIR__ . '/vendor/autoload.php';
+		// foreach ( glob( SCHEMA_PRO_GENESIS_INCLUDES_DIR . '*.php' ) as $file ) { include $file; }
 	}
 
 	/**
@@ -141,14 +143,25 @@ final class Schema_Pro_Genesis_Setup {
 	/**
 	 * Setup the updater.
 	 *
+	 * composer require yahnis-elsts/plugin-update-checker
+	 *
 	 * @uses    https://github.com/YahnisElsts/plugin-update-checker/
 	 *
 	 * @return  void
 	 */
 	public function updater() {
-		if ( ! class_exists( 'Puc_v4_Factory' ) ) {
-			require_once SCHEMA_PRO_GENESIS_INCLUDES_DIR . 'vendor/plugin-update-checker/plugin-update-checker.php'; // 4.4
+
+		// Bail if current user cannot manage plugins.
+		if ( ! current_user_can( 'install_plugins' ) ) {
+			return;
 		}
+
+		// Bail if plugin updater is not loaded.
+		if ( ! class_exists( 'Puc_v4_Factory' ) ) {
+			return;
+		}
+
+		// Setup the updater.
 		$updater = Puc_v4_Factory::buildUpdateChecker( 'https://github.com/bizbudding/wp-schema-pro-genesis', __FILE__, 'wp-schema-pro-genesis' );
 	}
 
@@ -179,43 +192,45 @@ final class Schema_Pro_Genesis_Setup {
 			return;
 		}
 
-		// Get schema settings.
-		$general_settings = BSF_AIOSRS_Pro_Admin::get_options( 'wp-schema-pro-general-settings' );
-		$global_settings  = BSF_AIOSRS_Pro_Admin::get_options( 'wp-schema-pro-global-schemas' );
-		$posts            = BSF_AIOSRS_Pro_Markup::get_schema_posts();
-
-		// Body.
-		if ( ! empty( $general_settings['site-represent'] ) ) {
-			add_filter( 'genesis_attr_body', array( $this, 'remove_attributes' ), 20 );
+		if ( class_exists( 'BSF_AIOSRS_Pro_Admin' ) ) {
+			// Get schema settings.
+			$general_settings = BSF_AIOSRS_Pro_Admin::get_options( 'wp-schema-pro-general-settings' );
+			// Body.
+			if ( ! empty( $general_settings['site-represent'] ) ) {
+				add_filter( 'genesis_attr_body', array( $this, 'remove_attributes' ), 20 );
+			}
 		}
 
-		// Breadcrumbs.
-		if ( '1' === $global_settings['breadcrumb'] ) {
-			add_filter( 'genesis_attr_breadcrumb',           array( $this, 'remove_attributes' ), 20 );
-			add_filter( 'genesis_attr_breadcrumb-link-wrap', array( $this, 'remove_attributes' ), 20 );
+		if ( class_exists( 'BSF_AIOSRS_Pro_Admin' ) && class_exists( 'BSF_AIOSRS_Pro_Markup' ) ) {
+			$global_settings  = BSF_AIOSRS_Pro_Admin::get_options( 'wp-schema-pro-global-schemas' );
+			$posts            = BSF_AIOSRS_Pro_Markup::get_schema_posts();
+			// Breadcrumbs.
+			if ( '1' === $global_settings['breadcrumb'] ) {
+				add_filter( 'genesis_attr_breadcrumb',           array( $this, 'remove_attributes' ), 20 );
+				add_filter( 'genesis_attr_breadcrumb-link-wrap', array( $this, 'remove_attributes' ), 20 );
+			}
+			// Content.
+			if ( is_array( $posts ) && ! empty( $posts ) ) {
+				add_filter( 'genesis_attr_content', array( $this, 'remove_attributes' ), 20 );
+				add_filter( 'genesis_attr_entry',   array( $this, 'remove_attributes' ), 20 );
+			}
+			// Bail if not a single page/post/cpt.
+			if ( ! is_singular() ) {
+				return;
+			}
+
+			// Set variables.
+			$post_id = get_the_ID();
+			$about   = (int)$global_settings['about-page'];
+			$contact = (int)$global_settings['contact-page'];
+
+			// Specific items.
+			if ( in_array( $post_id, array( $about, $contact ) ) ) {
+				add_filter( 'genesis_attr_content', array( $this, 'remove_attributes' ), 20 );
+				add_filter( 'genesis_attr_entry',   array( $this, 'remove_attributes' ), 20 );
+			}
 		}
 
-		// Content.
-		if ( is_array( $posts ) && ! empty( $posts ) ) {
-			add_filter( 'genesis_attr_content', array( $this, 'remove_attributes' ), 20 );
-			add_filter( 'genesis_attr_entry',   array( $this, 'remove_attributes' ), 20 );
-		}
-
-		// Bail if not a single page/post/cpt.
-		if ( ! is_singular() ) {
-			return;
-		}
-
-		// Set variables.
-		$post_id = get_the_ID();
-		$about   = (int)$global_settings['about-page'];
-		$contact = (int)$global_settings['contact-page'];
-
-		// Specific items.
-		if ( in_array( $post_id, array( $about, $contact ) ) ) {
-			add_filter( 'genesis_attr_content', array( $this, 'remove_attributes' ), 20 );
-			add_filter( 'genesis_attr_entry',   array( $this, 'remove_attributes' ), 20 );
-		}
 	}
 
 	/**
